@@ -1,58 +1,63 @@
 import java.util.Arrays;
+import java.util.*;
 
 public class Surrounded_Regions_130 {
     public static void main(String[] args) {
         solve(new char[][]{{'X', 'X', 'X', 'X'},{'X','O','O','X'},{'X', 'X','O','X'},{'X','O','X','X'}});
     }
     public static void solve(char[][] board) {
-        if (board.length == 0 || board[0].length == 0)
-            return;
-        if (board.length < 2 || board[0].length < 2)
-            return;
-        int m = board.length;
-        int n = board[0].length;
-        //Any 'O' connected to a boundary can't be turned to 'X', so ...
-        //Start from first and last column, turn 'O' to '*'.
-        for (int i = 0; i < m; i++) {
-            if (board[i][0] == 'O')
-                boundaryDFS(board, i, 0);
-            if (board[i][n-1] == 'O')
-                boundaryDFS(board, i, n-1);
-        }
-        //Start from first and last row, turn '0' to '*'
-        for (int j = 0; j < n; j++) {
-            if (board[0][j] == 'O')
-                boundaryDFS(board, 0, j);
-            if (board[m-1][j] == 'O')
-                boundaryDFS(board, m-1, j);
-        }
-        //post-prcessing, turn 'O' to 'X', '*' back to 'O', keep 'X' intact.
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (board[i][j] == 'O')
-                    board[i][j] = 'X';
-                else if (board[i][j] == '*')
-                    board[i][j] = 'O';
+        int rows = board.length;
+        int cols = board[0].length;
+        Set<List<Integer>> visi = new HashSet<>();
+        for(int i=0; i<rows; i++) {
+            for(int j=0; j<cols; j++) {
+                if(board[i][j] == 'O' && !visi.contains(List.of(i,j))) {
+                    bfs(i, j, board, visi);
+                }
             }
         }
-        for (char[] i: board)
-        {
-            System.out.println(Arrays.toString(i));
-        }
+        System.out.println(Arrays.deepToString(board));
     }
-    //Use DFS algo to turn internal however boundary-connected 'O' to '*';
-    private static void boundaryDFS(char[][] board, int i, int j) {
-        if (i < 0 || i > board.length - 1 || j <0 || j > board[0].length - 1)
-            return;
-        if (board[i][j] == 'O')
-            board[i][j] = '*';
-        if (i > 1 && board[i-1][j] == 'O')
-            boundaryDFS(board, i-1, j);
-        if (i < board.length - 2 && board[i+1][j] == 'O')
-            boundaryDFS(board, i+1, j);
-        if (j > 1 && board[i][j-1] == 'O')
-            boundaryDFS(board, i, j-1);
-        if (j < board[i].length - 2 && board[i][j+1] == 'O' )
-            boundaryDFS(board, i, j+1);
+
+    private static void bfs(int i, int j, char[][] board, Set<List<Integer>> visi) {
+        int rows = board.length;
+        int cols = board[0].length;
+        List<List<Integer>> dir = new ArrayList<>();
+        dir.add(List.of(-1,0));
+        dir.add(List.of(1,0));
+        dir.add(List.of(0,1));
+        dir.add(List.of(0,-1));
+        Queue<List<Integer>> q = new ArrayDeque<>();
+        q.add(List.of(i,j));
+        Set<List<Integer>> temp_visi = new HashSet<>();
+        boolean flag = true;
+        if(i == 0 || j == 0 || i == rows-1 || j == cols-1) {
+            flag = false;
+        }
+        visi.add(List.of(i, j));
+        temp_visi.add(List.of(i, j));
+        while(q.size() != 0) {
+            List<Integer> curr = q.poll();
+            int curr_r = curr.get(0);
+            int curr_c = curr.get(1);
+            for(List<Integer> d: dir) {
+                int sum_r = curr_r + d.get(0);
+                int sum_c = curr_c + d.get(1);
+                if(0<=sum_r && sum_r<rows && 0<= sum_c && sum_c<cols && board[sum_r][sum_c] == 'O' && !visi.contains(List.of(sum_r, sum_c))) {
+                    visi.add(List.of(sum_r, sum_c));
+                    temp_visi.add(List.of(sum_r, sum_c));
+                    q.add(List.of(sum_r, sum_c));
+                    if(sum_r == 0 || sum_r == rows-1 || sum_c == 0 || sum_c == cols-1) {
+                        flag = false;
+                    }
+                }
+            }
+        }
+
+        if(flag) {
+            for(List<Integer> li: temp_visi) {
+                board[li.get(0)][li.get(1)] = 'X';
+            }
+        }
     }
 }

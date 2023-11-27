@@ -1,6 +1,4 @@
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.*;
 
 public class Largest_Number_179 {
@@ -11,7 +9,7 @@ public class Largest_Number_179 {
     public static String largestNumber(int[] nums) {
         String[] s = new String[nums.length];
         extracted(nums, s);
-        Comparator<String> c = (o1, o2) -> (o1+o2).compareTo(o2+o1);
+        Comparator<String> c = (o1, o2) -> o2.compareTo(o1);
         Arrays.sort(s, c);
         return s[0].equals("0") ? "0" : String.join("",s);
     }
