@@ -8,14 +8,20 @@ public class Ransom_Note_383 {
     }
 
     public boolean canConstruct(String ransomNote, String magazine) {
-        Map<Character, Long> mp1 = magazine.chars()
-                .mapToObj(c -> (char) c)
-                .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
-        Map<Character, Long> mp2 = ransomNote.chars()
-                .mapToObj(c -> (char) c)
-                .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
-        for (Map.Entry<Character, Long> entry : mp2.entrySet()) {
-            if(mp1.get(entry.getKey()) == null || mp1.get(entry.getKey())<entry.getValue()) {
+        StringBuilder check = new StringBuilder();
+        StringBuilder with = new StringBuilder();
+        check.append(ransomNote);
+        with.append(magazine);
+        for(char c: check.toString().toCharArray()) {
+            boolean flag = false;
+            for(int i=0; i<with.length(); i++) {
+                if(with.charAt(i) == c) {
+                    flag = true;
+                    with.deleteCharAt(i);
+                    break;
+                }
+            }
+            if(!flag) {
                 return false;
             }
         }
